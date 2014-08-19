@@ -124,11 +124,10 @@ define keepalived::vrrp::instance (
   $notify_script              = undef,
 
 ) {
-  concat::fragment { "keepalived.conf_vrrp_instance_${name}":
-    ensure  => $ensure,
-    target  => "${::keepalived::config_dir}/keepalived.conf",
+  file { "${::keepalived::config_dir}/conf.d/${name}.conf":
+    ensure  => present,
     content => template('keepalived/vrrp_instance.erb'),
-    order   => 100,
   }
 }
 
+create_resources(keepalived::vrrp::instance, hiera_hash("keepalived-instances", {}))

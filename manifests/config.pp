@@ -21,6 +21,14 @@ class keepalived::config {
     owner  => $::keepalived::config_owner,
   }
 
+  file { "${::keepalived::config_dir}/conf.d":
+    ensure => directory,
+    group  => $::keepalived::config_group,
+    mode   => $::keepalived::config_dir_mode,
+    owner  => $::keepalived::config_owner,
+    require => $::keepalived::config_dir
+  }
+
   concat { "${::keepalived::config_dir}/keepalived.conf":
     owner => $::keepalived::config_owner,
     group => $::keepalived::config_group,
@@ -31,6 +39,12 @@ class keepalived::config {
     target  => "${::keepalived::config_dir}/keepalived.conf",
     content => "# Managed by Puppet\n",
     order   => 001,
+  }
+
+  concat::fragment { 'keepalived.include':
+    target  => "${::keepalived::config_dir}/keepalived.conf",
+    content => "include /etc/keepalived/conf.d\n",
+    order   => 002,
   }
 
   concat::fragment { 'keepalived.conf_footer':
