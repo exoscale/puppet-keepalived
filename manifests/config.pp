@@ -26,7 +26,7 @@ class keepalived::config {
     group  => $::keepalived::config_group,
     mode   => $::keepalived::config_dir_mode,
     owner  => $::keepalived::config_owner,
-    require => $::keepalived::config_dir
+    require => Class['::keepalived::install']
   }
 
   concat { "${::keepalived::config_dir}/keepalived.conf":
@@ -43,7 +43,7 @@ class keepalived::config {
 
   concat::fragment { 'keepalived.include':
     target  => "${::keepalived::config_dir}/keepalived.conf",
-    content => "include /etc/keepalived/conf.d\n",
+    content => "include /etc/keepalived/conf.d/*.conf\n",
     order   => 002,
   }
 
@@ -52,5 +52,7 @@ class keepalived::config {
     content => "\n",
     order   => 999,
   }
+
+create_resources(keepalived::vrrp::instance, hiera_hash("keepalived-instances", {}))
 }
 
